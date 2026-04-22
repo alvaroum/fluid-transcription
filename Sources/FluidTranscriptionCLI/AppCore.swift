@@ -3,7 +3,9 @@ import Foundation
 
 enum AppConstants {
     static let appName = "fluid-transcription"
-    static let appVersion = "202604.3"
+    static let commandName = "ft"
+    static let legacyCommandName = "fluid-transcription"
+    static let appVersion = "202604.4"
     static let schemaVersion = "1.0.0-draft"
     static let fluidAudioVersion = "0.13.6"
 }

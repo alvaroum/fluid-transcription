@@ -3,13 +3,13 @@
 ## Install
 
 ```bash
-fluid-transcription --help
+ft --help
 ```
 
 ## Run the main workflow
 
 ```bash
-fluid-transcription process \
+ft process \
   --input ./meeting.m4a \
   --output ./runs
 ```
@@ -30,7 +30,7 @@ Typical contents:
 ## Validate the run
 
 ```bash
-fluid-transcription validate \
+ft validate \
   --run-dir ./runs/<job-id>
 ```
 
@@ -39,7 +39,7 @@ fluid-transcription validate \
 Transcription only:
 
 ```bash
-fluid-transcription transcribe \
+ft transcribe \
   --input ./meeting.m4a \
   --output ./runs
 ```
@@ -47,7 +47,7 @@ fluid-transcription transcribe \
 Diarization only:
 
 ```bash
-fluid-transcription diarize \
+ft diarize \
   --input ./meeting.m4a \
   --output ./runs
 ```

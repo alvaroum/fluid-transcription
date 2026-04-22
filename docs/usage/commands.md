@@ -13,7 +13,7 @@ Prints a JSON payload containing:
 Example:
 
 ```bash
-fluid-transcription version
+ft version
 ```
 
 ## `transcribe`
@@ -27,7 +27,7 @@ Transcribes an input file and writes:
 Example:
 
 ```bash
-fluid-transcription transcribe \
+ft transcribe \
   --input ./meeting.m4a \
   --output ./runs \
   --model-version v3
@@ -44,7 +44,7 @@ Runs speaker diarization and writes:
 Example:
 
 ```bash
-fluid-transcription diarize \
+ft diarize \
   --input ./meeting.m4a \
   --output ./runs
 ```
@@ -63,7 +63,7 @@ Runs transcription and diarization together and writes:
 Example:
 
 ```bash
-fluid-transcription process \
+ft process \
   --input ./meeting.m4a \
   --output ./runs \
   --overwrite
@@ -76,7 +76,7 @@ Checks whether a previously generated run directory matches the expected output 
 Example:
 
 ```bash
-fluid-transcription validate \
+ft validate \
   --run-dir ./runs/example-job
 ```
 

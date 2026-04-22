@@ -17,6 +17,8 @@ This documentation is structured as a future documentation site rather than a si
 - Read [Installation](getting-started/installation.md) to install the CLI from a GitHub release or Homebrew.
 - Read [Quickstart](getting-started/quickstart.md) for the shortest usable path.
 
+The preferred installed command is `ft`, with `fluid-transcription` kept as a compatibility alias.
+
 ## Main User Topics
 
 - [CLI Overview](usage/cli-overview.md)

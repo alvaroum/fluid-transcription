@@ -22,15 +22,17 @@ jobs:
       - name: Stage release layout
         run: |
           mkdir -p release/bin
-          cp .build/release/FluidTranscriptionCLI release/bin/fluid-transcription
-          chmod +x release/bin/fluid-transcription
+          cp .build/release/FluidTranscriptionCLI release/bin/ft
+          chmod +x release/bin/ft
+          ln -sf ft release/bin/fluid-transcription
       - name: Build installer package
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
           ARCH="$(uname -m)"
           mkdir -p pkgroot/usr/local/bin
-          cp release/bin/fluid-transcription pkgroot/usr/local/bin/fluid-transcription
-          chmod 755 pkgroot/usr/local/bin/fluid-transcription
+          cp release/bin/ft pkgroot/usr/local/bin/ft
+          chmod 755 pkgroot/usr/local/bin/ft
+          ln -sf ft pkgroot/usr/local/bin/fluid-transcription
           pkgbuild \
             --root pkgroot \
             --identifier com.alvaroum.fluid-transcription \

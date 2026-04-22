@@ -3,6 +3,12 @@
 The application command name is:
 
 ```bash
+ft
+```
+
+Installed packages also provide:
+
+```bash
 fluid-transcription
 ```
 

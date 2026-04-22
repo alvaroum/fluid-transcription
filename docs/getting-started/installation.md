@@ -23,6 +23,12 @@ Open the package and follow the macOS installer steps.
 The installer places the CLI at:
 
 ```bash
+/usr/local/bin/ft
+```
+
+It also installs a compatibility alias at:
+
+```bash
 /usr/local/bin/fluid-transcription
 ```
 
@@ -33,11 +39,11 @@ That location is already on the default shell `PATH` for standard macOS Terminal
 For users who prefer package management:
 
 ```bash
-brew tap alvaroum/tap
+brew tap alvaroum/fluid-transcription
 brew install fluid-transcription
 ```
 
-This installs the same release binary into Homebrew's managed prefix and exposes the `fluid-transcription` command on `PATH`.
+This installs the same release binary into Homebrew's managed prefix and exposes both `ft` and `fluid-transcription` on `PATH`.
 
 Current note:
 
@@ -59,9 +65,11 @@ brew install ffmpeg
 ## Verify the Install
 
 ```bash
-fluid-transcription version
-fluid-transcription --help
+ft version
+ft --help
 ```
+
+The legacy `fluid-transcription` command name remains available as an alias.
 
 ## Build From Source
 

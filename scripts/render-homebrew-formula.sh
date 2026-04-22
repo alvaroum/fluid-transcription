@@ -21,11 +21,12 @@ class FluidTranscription < Formula
   depends_on arch: :arm64
 
   def install
-    bin.install "fluid-transcription"
+    bin.install "ft"
+    bin.install_symlink "ft" => "fluid-transcription"
   end
 
   test do
-    output = shell_output("#{bin}/fluid-transcription version")
+    output = shell_output("#{bin}/ft version")
     assert_match "fluid-transcription", output
   end
 end

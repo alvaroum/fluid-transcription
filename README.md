@@ -17,7 +17,7 @@ It is built in Swift, uses FluidAudio directly as a package dependency, and prod
 - Platform: macOS 14+
 - Language/toolchain: Swift 6 / Swift Package Manager
 - Audio engine: FluidAudio `0.13.6`
-- CLI version: `202604.3`
+- CLI version: `202604.4`
 - Output schema version: `1.0.0-draft`
 
 ## Install
@@ -26,7 +26,7 @@ It is built in Swift, uses FluidAudio directly as a package dependency, and prod
 
 ```bash
 # Download the .pkg from the latest GitHub release and open it.
-# It installs fluid-transcription into /usr/local/bin.
+# It installs ft into /usr/local/bin and also adds a fluid-transcription compatibility alias.
 open https://github.com/alvaroum/fluid-transcription/releases/latest
 ```
 
@@ -35,7 +35,7 @@ The installer package is not signed or notarized yet, so macOS may require a one
 ### Homebrew
 
 ```bash
-brew tap alvaroum/tap
+brew tap alvaroum/fluid-transcription
 brew install fluid-transcription
 ```
 
@@ -50,13 +50,13 @@ brew install ffmpeg
 ### 1. Check the CLI surface
 
 ```bash
-fluid-transcription --help
+ft --help
 ```
 
 ### 2. Run a full processing job
 
 ```bash
-fluid-transcription process \
+ft process \
   --input ./meeting.m4a \
   --output ./runs
 ```
@@ -64,9 +64,11 @@ fluid-transcription process \
 ### 3. Validate the generated run
 
 ```bash
-fluid-transcription validate \
+ft validate \
   --run-dir ./runs/<job-id>
 ```
+
+The release packages also install `fluid-transcription` as a compatibility alias for existing scripts.
 
 ## Commands
 

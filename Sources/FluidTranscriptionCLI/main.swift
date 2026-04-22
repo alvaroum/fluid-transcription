@@ -4,7 +4,7 @@ import Foundation
 
 struct FluidTranscriptionCLI: ParsableCommand {
     static let configuration = CommandConfiguration(
-        commandName: AppConstants.appName,
+    commandName: AppConstants.commandName,
                 abstract: "Native macOS CLI for transcription, speaker diarization, and combined processing.",
                 discussion: """
                 Capabilities:
@@ -24,7 +24,10 @@ struct FluidTranscriptionCLI: ParsableCommand {
                     - Deterministic run directories under the output folder
 
                 Typical use:
-                    fluid-transcription process --input meeting.m4a --output ./runs
+                    ft process --input meeting.m4a --output ./runs
+
+                Compatibility:
+                    - The installed packages also provide `fluid-transcription` as a compatibility alias.
                 """,
         subcommands: [VersionCommand.self, TranscribeCommand.self, DiarizeCommand.self, ProcessCommand.self, ValidateCommand.self]
     )
