@@ -10,6 +10,18 @@ It runs on pushed tags matching:
 v*
 ```
 
+Release tags are expected to use the format:
+
+```text
+vyyyymm.i
+```
+
+Example:
+
+```text
+v202604.1
+```
+
 ## Current Release Steps
 
 1. Build the Swift package
@@ -34,6 +46,7 @@ release/
 - The packaged binary name is `fluid-transcription`.
 - The SwiftPM target name remains `FluidTranscriptionCLI`.
 - Models are not bundled into the release artifact.
+- The first public release for this repository follows the tag `v202604.1`.
 
 ## Suggested Future Enhancements
 

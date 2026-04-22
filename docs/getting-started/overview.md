@@ -25,6 +25,10 @@ The CLI currently exposes five commands:
 - Minimal command surface
 - Safe handling of codec/container edge cases through normalization
 
+## License
+
+The project is licensed under Apache License 2.0.
+
 ## What Makes This Repo Different
 
 This repository is not a wrapper around a separate transcription binary.

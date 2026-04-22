@@ -17,7 +17,7 @@ It is built in Swift, uses FluidAudio directly as a package dependency, and prod
 - Platform: macOS 14+
 - Language/toolchain: Swift 6 / Swift Package Manager
 - Audio engine: FluidAudio `0.13.6`
-- CLI version: `0.2.0`
+- CLI version: `202604.1`
 - Output schema version: `1.0.0-draft`
 
 ## Quick Start
@@ -139,6 +139,10 @@ Longer-form documentation lives in `docs/` and is organized so it can later be p
 The docs now also include example artifact snippets so consumers can understand the JSON shape before integrating against it.
 
 An initial `mkdocs.yml` is included so the docs can be served or published later with minimal restructuring.
+
+## License
+
+This project is licensed under Apache License 2.0. See `LICENSE`.
 
 ## Limitations
 
