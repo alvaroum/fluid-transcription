@@ -2,6 +2,10 @@
 
 Fluid Transcription is designed for local, scriptable media processing on macOS.
 
+The preferred installed command is `ft`.
+
+Release packages and Homebrew also provide `fluid-transcription` as a compatibility alias for existing scripts.
+
 The CLI currently exposes five commands:
 
 - `process`

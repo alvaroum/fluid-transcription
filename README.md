@@ -39,6 +39,8 @@ brew tap alvaroum/fluid-transcription
 brew install fluid-transcription
 ```
 
+This uses the app-specific Homebrew tap backed by the repository `alvaroum/homebrew-fluid-transcription`.
+
 ### Optional codec fallback
 
 ```bash

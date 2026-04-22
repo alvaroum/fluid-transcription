@@ -58,6 +58,7 @@ release/
 - The packaged primary command name is `ft`.
 - The release artifacts also include `fluid-transcription` as a compatibility symlink.
 - The SwiftPM target name remains `FluidTranscriptionCLI`.
+- The Homebrew tap name is `alvaroum/fluid-transcription`, backed by the repository `alvaroum/homebrew-fluid-transcription`.
 - Direct downloads should use the `.pkg` installer; the tarball is primarily for Homebrew and advanced manual installation.
 - Models are not bundled into the release artifact.
 - The current public release line for this repository is `v202604.4`.

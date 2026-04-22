@@ -8,6 +8,8 @@ swift build
 ./.build/debug/FluidTranscriptionCLI --help
 ```
 
+For packaged installs, the preferred command name is `ft`. Inside the repository, the executable path remains `./.build/debug/FluidTranscriptionCLI` or `./.build/release/FluidTranscriptionCLI`.
+
 ## Useful Smoke Checks
 
 Process help surface:
@@ -36,6 +38,7 @@ Run validation:
 
 - `test-inputs/` and `test-runs/` are ignored because they are local artifacts.
 - `site/` is ignored because it is the generated documentation output directory.
+- The public Homebrew tap is `alvaroum/fluid-transcription`, backed by the repository `alvaroum/homebrew-fluid-transcription`.
 
 ## What To Verify After CLI Changes
 
