@@ -1,9 +1,6 @@
-__pycache__/
-.pytest_cache/
-.venv/
-build/
-dist/
+.build/
+.swiftpm/
+.DS_Store
 release/
-*.egg-info/
-*.pyc
-vendor/FluidAudio/
+dist/
+vendor/
