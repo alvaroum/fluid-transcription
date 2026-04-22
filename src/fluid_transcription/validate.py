@@ -24,6 +24,9 @@ def validate_run_directory(run_dir: Path) -> dict:
         if not artifact_path.exists():
             errors.append(f"Missing artifact referenced by run.json: {artifact_name}")
             continue
+        if artifact_name == "events.jsonl":
+            _validate_jsonl(artifact_path, errors)
+            continue
         payload = _load_json(artifact_path, errors)
         if not isinstance(payload, dict):
             errors.append(f"Artifact must contain a JSON object: {artifact_name}")
@@ -49,6 +52,11 @@ def _validate_payload(name: str, payload: dict, errors: list[str], warnings: lis
             warnings.append("combined.json contains no utterances")
         for index, utterance in enumerate(utterances, start=1):
             _validate_time_pair(name, f"utterances[{index}]", utterance.get("start_sec"), utterance.get("end_sec"), errors, allow_null=True)
+    elif name == "errors.json":
+        if payload.get("error") is None:
+            errors.append("errors.json: missing error")
+        if payload.get("exit_code") is None:
+            errors.append("errors.json: missing exit_code")
 
 
 def _validate_time_pair(
@@ -75,3 +83,21 @@ def _load_json(path: Path, errors: list[str]) -> dict | list | None:
     except json.JSONDecodeError as exc:
         errors.append(f"Invalid JSON in {path.name}: {exc}")
         return None
+
+
+def _validate_jsonl(path: Path, errors: list[str]) -> None:
+    for line_number, raw_line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+        if not raw_line.strip():
+            continue
+        try:
+            payload = json.loads(raw_line)
+        except json.JSONDecodeError as exc:
+            errors.append(f"Invalid JSONL in {path.name} line {line_number}: {exc}")
+            continue
+        if not isinstance(payload, dict):
+            errors.append(f"events.jsonl line {line_number} must be a JSON object")
+            continue
+        if payload.get("event") is None:
+            errors.append(f"events.jsonl line {line_number} missing event")
+        if payload.get("timestamp") is None:
+            errors.append(f"events.jsonl line {line_number} missing timestamp")

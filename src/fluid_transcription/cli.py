@@ -8,7 +8,7 @@ from fluid_transcription.adapter import FluidAudioAdapter
 from fluid_transcription.errors import CLIError, ExitCode
 from fluid_transcription.merge import build_markdown, combine_artifacts
 from fluid_transcription.normalize import normalize_diarization, normalize_transcript
-from fluid_transcription.utils import create_job_context, write_json, write_text
+from fluid_transcription.utils import create_job_context, utc_now, write_json, write_jsonl, write_text
 from fluid_transcription.validate import validate_run_directory
 
 
@@ -90,16 +90,25 @@ def _handle_transcribe(args: argparse.Namespace) -> dict:
         job_id=args.job_id,
         overwrite=args.overwrite,
     )
-    adapter = FluidAudioAdapter(cli_bin=args.fluidaudio_cli_bin, repo_path=args.fluidaudio_repo)
-    raw_result = adapter.transcribe(context.input_path, model_version=args.model_version)
-    transcript = normalize_transcript(context.job_id, str(context.input_path), raw_result)
+    events = [_event("job_started", job_id=context.job_id, mode=context.mode)]
+    try:
+        adapter = FluidAudioAdapter(cli_bin=args.fluidaudio_cli_bin, repo_path=args.fluidaudio_repo)
+        events.append(_event("adapter_probe", **adapter.probe().to_dict()))
+        raw_result = adapter.transcribe(context.input_path, model_version=args.model_version)
+        transcript = normalize_transcript(context.job_id, str(context.input_path), raw_result)
 
-    write_text(context.run_dir / "raw" / "transcribe.stdout.txt", raw_result["stdout"])
-    write_text(context.run_dir / "raw" / "transcribe.stderr.txt", raw_result["stderr"])
-    write_json(context.run_dir / "transcript.json", transcript)
+        write_text(context.run_dir / "raw" / "transcribe.stdout.txt", raw_result["stdout"])
+        write_text(context.run_dir / "raw" / "transcribe.stderr.txt", raw_result["stderr"])
+        write_json(context.run_dir / "transcript.json", transcript)
+        events.append(_event("artifact_written", artifact="transcript.json"))
 
-    payload = _write_run_record(context, ["transcript.json"])
-    return payload
+        payload = _write_run_record(context, ["transcript.json", "events.jsonl"])
+        events.append(_event("job_completed", status="completed"))
+        write_jsonl(context.run_dir / "events.jsonl", events)
+        return payload
+    except CLIError as exc:
+        _write_failure_artifacts(context, events, exc)
+        raise
 
 
 def _handle_diarize(args: argparse.Namespace) -> dict:
@@ -110,22 +119,31 @@ def _handle_diarize(args: argparse.Namespace) -> dict:
         job_id=args.job_id,
         overwrite=args.overwrite,
     )
-    adapter = FluidAudioAdapter(cli_bin=args.fluidaudio_cli_bin, repo_path=args.fluidaudio_repo)
-    raw_path = context.run_dir / "raw" / "diarization.raw.json"
-    raw_result = adapter.diarize(
-        context.input_path,
-        output_path=raw_path,
-        mode=args.mode,
-        threshold=args.threshold,
-    )
-    diarization = normalize_diarization(context.job_id, str(context.input_path), raw_result)
+    events = [_event("job_started", job_id=context.job_id, mode=context.mode)]
+    try:
+        adapter = FluidAudioAdapter(cli_bin=args.fluidaudio_cli_bin, repo_path=args.fluidaudio_repo)
+        events.append(_event("adapter_probe", **adapter.probe().to_dict()))
+        raw_path = context.run_dir / "raw" / "diarization.raw.json"
+        raw_result = adapter.diarize(
+            context.input_path,
+            output_path=raw_path,
+            mode=args.mode,
+            threshold=args.threshold,
+        )
+        diarization = normalize_diarization(context.job_id, str(context.input_path), raw_result)
 
-    write_text(context.run_dir / "raw" / "diarize.stdout.txt", raw_result["stdout"])
-    write_text(context.run_dir / "raw" / "diarize.stderr.txt", raw_result["stderr"])
-    write_json(context.run_dir / "diarization.json", diarization)
+        write_text(context.run_dir / "raw" / "diarize.stdout.txt", raw_result["stdout"])
+        write_text(context.run_dir / "raw" / "diarize.stderr.txt", raw_result["stderr"])
+        write_json(context.run_dir / "diarization.json", diarization)
+        events.append(_event("artifact_written", artifact="diarization.json"))
 
-    payload = _write_run_record(context, ["diarization.json"])
-    return payload
+        payload = _write_run_record(context, ["diarization.json", "events.jsonl"])
+        events.append(_event("job_completed", status="completed"))
+        write_jsonl(context.run_dir / "events.jsonl", events)
+        return payload
+    except CLIError as exc:
+        _write_failure_artifacts(context, events, exc)
+        raise
 
 
 def _handle_process(args: argparse.Namespace) -> dict:
@@ -136,31 +154,46 @@ def _handle_process(args: argparse.Namespace) -> dict:
         job_id=args.job_id,
         overwrite=args.overwrite,
     )
-    adapter = FluidAudioAdapter(cli_bin=args.fluidaudio_cli_bin, repo_path=args.fluidaudio_repo)
-    raw_transcript = adapter.transcribe(context.input_path, model_version=args.model_version)
-    raw_diarization_path = context.run_dir / "raw" / "diarization.raw.json"
-    raw_diarization = adapter.diarize(
-        context.input_path,
-        output_path=raw_diarization_path,
-        mode=args.mode,
-        threshold=args.threshold,
-    )
+    events = [_event("job_started", job_id=context.job_id, mode=context.mode)]
+    try:
+        adapter = FluidAudioAdapter(cli_bin=args.fluidaudio_cli_bin, repo_path=args.fluidaudio_repo)
+        events.append(_event("adapter_probe", **adapter.probe().to_dict()))
+        raw_transcript = adapter.transcribe(context.input_path, model_version=args.model_version)
+        raw_diarization_path = context.run_dir / "raw" / "diarization.raw.json"
+        raw_diarization = adapter.diarize(
+            context.input_path,
+            output_path=raw_diarization_path,
+            mode=args.mode,
+            threshold=args.threshold,
+        )
 
-    transcript = normalize_transcript(context.job_id, str(context.input_path), raw_transcript)
-    diarization = normalize_diarization(context.job_id, str(context.input_path), raw_diarization)
-    combined = combine_artifacts(context.job_id, str(context.input_path), transcript, diarization)
+        transcript = normalize_transcript(context.job_id, str(context.input_path), raw_transcript)
+        diarization = normalize_diarization(context.job_id, str(context.input_path), raw_diarization)
+        combined = combine_artifacts(context.job_id, str(context.input_path), transcript, diarization)
 
-    write_text(context.run_dir / "raw" / "transcribe.stdout.txt", raw_transcript["stdout"])
-    write_text(context.run_dir / "raw" / "transcribe.stderr.txt", raw_transcript["stderr"])
-    write_text(context.run_dir / "raw" / "diarize.stdout.txt", raw_diarization["stdout"])
-    write_text(context.run_dir / "raw" / "diarize.stderr.txt", raw_diarization["stderr"])
-    write_json(context.run_dir / "transcript.json", transcript)
-    write_json(context.run_dir / "diarization.json", diarization)
-    write_json(context.run_dir / "combined.json", combined)
-    write_text(context.run_dir / "combined.md", build_markdown(combined))
+        write_text(context.run_dir / "raw" / "transcribe.stdout.txt", raw_transcript["stdout"])
+        write_text(context.run_dir / "raw" / "transcribe.stderr.txt", raw_transcript["stderr"])
+        write_text(context.run_dir / "raw" / "diarize.stdout.txt", raw_diarization["stdout"])
+        write_text(context.run_dir / "raw" / "diarize.stderr.txt", raw_diarization["stderr"])
+        write_json(context.run_dir / "transcript.json", transcript)
+        write_json(context.run_dir / "diarization.json", diarization)
+        write_json(context.run_dir / "combined.json", combined)
+        write_text(context.run_dir / "combined.md", build_markdown(combined))
+        events.extend(
+            [
+                _event("artifact_written", artifact="transcript.json"),
+                _event("artifact_written", artifact="diarization.json"),
+                _event("artifact_written", artifact="combined.json"),
+            ]
+        )
 
-    payload = _write_run_record(context, ["transcript.json", "diarization.json", "combined.json"])
-    return payload
+        payload = _write_run_record(context, ["transcript.json", "diarization.json", "combined.json", "events.jsonl"])
+        events.append(_event("job_completed", status="completed"))
+        write_jsonl(context.run_dir / "events.jsonl", events)
+        return payload
+    except CLIError as exc:
+        _write_failure_artifacts(context, events, exc)
+        raise
 
 
 def _write_run_record(context, artifacts: list[str]) -> dict:
@@ -177,6 +210,39 @@ def _write_run_record(context, artifacts: list[str]) -> dict:
     }
     write_json(context.run_dir / "run.json", payload)
     return payload
+
+
+def _write_failure_artifacts(context, events: list[dict], exc: CLIError) -> None:
+    events.append(_event("job_failed", error=exc.message, exit_code=int(exc.exit_code)))
+    write_json(
+        context.run_dir / "errors.json",
+        {
+            "schema_version": SCHEMA_VERSION,
+            **exc.to_dict(),
+        },
+    )
+    write_json(
+        context.run_dir / "run.json",
+        {
+            "schema_version": SCHEMA_VERSION,
+            "job_id": context.job_id,
+            "mode": context.mode,
+            "input": str(context.input_path),
+            "run_dir": str(context.run_dir),
+            "created_at": context.created_at,
+            "status": "failed",
+            "artifacts": ["errors.json", "events.jsonl"],
+        },
+    )
+    write_jsonl(context.run_dir / "events.jsonl", events)
+
+
+def _event(event: str, **payload: object) -> dict:
+    return {
+        "timestamp": utc_now(),
+        "event": event,
+        **payload,
+    }
 
 
 def print_json(payload: dict, stderr: bool = False) -> None:

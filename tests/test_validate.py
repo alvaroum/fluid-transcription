@@ -15,7 +15,7 @@ class ValidateRunDirectoryTests(unittest.TestCase):
                 json.dumps(
                     {
                         "schema_version": "1.0.0-draft",
-                        "artifacts": ["transcript.json"],
+                        "artifacts": ["transcript.json", "events.jsonl"],
                     }
                 ),
                 encoding="utf-8",
@@ -35,6 +35,10 @@ class ValidateRunDirectoryTests(unittest.TestCase):
                         ],
                     }
                 ),
+                encoding="utf-8",
+            )
+            (run_dir / "events.jsonl").write_text(
+                "{\"timestamp\": \"2026-04-22T12:00:00+00:00\", \"event\": \"job_completed\"}\n",
                 encoding="utf-8",
             )
 

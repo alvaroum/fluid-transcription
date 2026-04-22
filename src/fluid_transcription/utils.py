@@ -67,5 +67,10 @@ def write_json(path: Path, payload: dict | list) -> None:
     path.write_text(json.dumps(payload, indent=2, sort_keys=False) + "\n", encoding="utf-8")
 
 
+def write_jsonl(path: Path, records: list[dict]) -> None:
+    content = "\n".join(json.dumps(record, sort_keys=False) for record in records)
+    path.write_text(content + ("\n" if content else ""), encoding="utf-8")
+
+
 def write_text(path: Path, content: str) -> None:
     path.write_text(content.rstrip() + "\n", encoding="utf-8")
