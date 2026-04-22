@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fluid-transcription"
+version = "0.1.0"
+description = "CLI-first transcription and diarization wrapper for FluidAudio on macOS"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+fluid-transcription = "fluid_transcription.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
