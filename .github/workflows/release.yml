@@ -13,19 +13,59 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+      - id: fluidaudio-lock
+        name: Load FluidAudio lockfile
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          lock = json.loads(Path('fluidaudio.lock.json').read_text())
+          with open(Path.cwd() / 'fluidaudio-lock.out', 'w', encoding='utf-8') as handle:
+              handle.write(f"repository={lock['repository']}\n")
+              handle.write(f"tag={lock['tag']}\n")
+          PY
+          cat fluidaudio-lock.out >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.fluidaudio-lock.outputs.repository }}
+          ref: ${{ steps.fluidaudio-lock.outputs.tag }}
+          path: vendor/FluidAudio
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Build vendored FluidAudio CLI
+        run: swift build -c release --package-path vendor/FluidAudio --product fluidaudiocli
+      - name: Stage bundled FluidAudio binary
+        run: python scripts/stage_bundled_fluidaudio.py --engine-binary vendor/FluidAudio/.build/release/fluidaudiocli --tag "${{ steps.fluidaudio-lock.outputs.tag }}"
       - name: Install build tooling
-        run: python -m pip install --upgrade pip build
-      - name: Build release artifacts
-        run: python -m build
+        run: python -m pip install --upgrade pip pyinstaller
+      - name: Run tests
+        run: |
+          python -m pip install -e .
+          python -m unittest discover -s tests -v
+      - name: Build bundled app
+        run: |
+          pyinstaller \
+            --noconfirm \
+            --clean \
+            --name fluid-transcription \
+            --onedir \
+            --console \
+            --paths src \
+            --add-data 'src/fluid_transcription/bundled/fluidaudio:fluid_transcription/bundled/fluidaudio' \
+            src/fluid_transcription/__main__.py
+      - name: Create release archives
+        run: |
+          mkdir -p release
+          VERSION="${GITHUB_REF_NAME#v}"
+          ARCH="$(uname -m)"
+          tar -C dist -czf "release/fluid-transcription-${VERSION}-macos-${ARCH}.tar.gz" fluid-transcription
       - name: Generate checksums
         run: |
-          cd dist
+          cd release
           shasum -a 256 * > SHA256SUMS
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/*
+            release/*

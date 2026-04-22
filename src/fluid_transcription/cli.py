@@ -43,7 +43,8 @@ def build_parser() -> argparse.ArgumentParser:
 
     version_parser = subparsers.add_parser("version")
     version_parser.add_argument("--fluidaudio-cli-bin")
-    version_parser.add_argument("--fluidaudio-repo")
+    version_parser.add_argument("--bundled-engine-path")
+    version_parser.add_argument("--vendored-fluidaudio-repo")
 
     validate_parser = subparsers.add_parser("validate")
     validate_parser.add_argument("--run-dir", required=True)
@@ -55,7 +56,8 @@ def build_parser() -> argparse.ArgumentParser:
         command_parser.add_argument("--job-id")
         command_parser.add_argument("--overwrite", action="store_true")
         command_parser.add_argument("--fluidaudio-cli-bin")
-        command_parser.add_argument("--fluidaudio-repo")
+        command_parser.add_argument("--bundled-engine-path")
+        command_parser.add_argument("--vendored-fluidaudio-repo")
         command_parser.add_argument("--model-version")
         if name in {"diarize", "process"}:
             command_parser.add_argument("--mode", choices=["offline", "streaming"], default="offline")
@@ -65,7 +67,11 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def _handle_version(args: argparse.Namespace) -> dict:
-    adapter = FluidAudioAdapter(cli_bin=args.fluidaudio_cli_bin, repo_path=args.fluidaudio_repo)
+    adapter = FluidAudioAdapter(
+        cli_bin=args.fluidaudio_cli_bin,
+        bundled_engine_path=args.bundled_engine_path,
+        vendored_repo_path=args.vendored_fluidaudio_repo,
+    )
     return {
         "app": "fluid-transcription",
         "app_version": __version__,
@@ -92,7 +98,11 @@ def _handle_transcribe(args: argparse.Namespace) -> dict:
     )
     events = [_event("job_started", job_id=context.job_id, mode=context.mode)]
     try:
-        adapter = FluidAudioAdapter(cli_bin=args.fluidaudio_cli_bin, repo_path=args.fluidaudio_repo)
+        adapter = FluidAudioAdapter(
+            cli_bin=args.fluidaudio_cli_bin,
+            bundled_engine_path=args.bundled_engine_path,
+            vendored_repo_path=args.vendored_fluidaudio_repo,
+        )
         events.append(_event("adapter_probe", **adapter.probe().to_dict()))
         raw_result = adapter.transcribe(context.input_path, model_version=args.model_version)
         transcript = normalize_transcript(context.job_id, str(context.input_path), raw_result)
@@ -121,7 +131,11 @@ def _handle_diarize(args: argparse.Namespace) -> dict:
     )
     events = [_event("job_started", job_id=context.job_id, mode=context.mode)]
     try:
-        adapter = FluidAudioAdapter(cli_bin=args.fluidaudio_cli_bin, repo_path=args.fluidaudio_repo)
+        adapter = FluidAudioAdapter(
+            cli_bin=args.fluidaudio_cli_bin,
+            bundled_engine_path=args.bundled_engine_path,
+            vendored_repo_path=args.vendored_fluidaudio_repo,
+        )
         events.append(_event("adapter_probe", **adapter.probe().to_dict()))
         raw_path = context.run_dir / "raw" / "diarization.raw.json"
         raw_result = adapter.diarize(
@@ -156,7 +170,11 @@ def _handle_process(args: argparse.Namespace) -> dict:
     )
     events = [_event("job_started", job_id=context.job_id, mode=context.mode)]
     try:
-        adapter = FluidAudioAdapter(cli_bin=args.fluidaudio_cli_bin, repo_path=args.fluidaudio_repo)
+        adapter = FluidAudioAdapter(
+            cli_bin=args.fluidaudio_cli_bin,
+            bundled_engine_path=args.bundled_engine_path,
+            vendored_repo_path=args.vendored_fluidaudio_repo,
+        )
         events.append(_event("adapter_probe", **adapter.probe().to_dict()))
         raw_transcript = adapter.transcribe(context.input_path, model_version=args.model_version)
         raw_diarization_path = context.run_dir / "raw" / "diarization.raw.json"

@@ -17,3 +17,9 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+fluid_transcription = [
+	"bundled/fluidaudio/manifest.json",
+	"bundled/fluidaudio/bin/*",
+]
