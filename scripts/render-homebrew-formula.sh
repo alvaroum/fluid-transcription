@@ -15,12 +15,13 @@ class FluidTranscription < Formula
   desc "Native macOS CLI for transcription, speaker diarization, and combined media-processing workflows"
   homepage "https://github.com/alvaroum/fluid-transcription"
   url "https://github.com/alvaroum/fluid-transcription/releases/download/v${version}/fluid-transcription-${version}-macos-arm64.tar.gz"
+  version "${version}"
   sha256 "${sha256}"
   license "Apache-2.0"
   depends_on arch: :arm64
 
   def install
-    bin.install "bin/fluid-transcription"
+    bin.install "fluid-transcription"
   end
 
   test do
