@@ -1,0 +1,31 @@
+site_name: Fluid Transcription
+site_description: Native macOS CLI documentation for transcription, speaker diarization, and combined media-processing workflows.
+repo_name: Fluid Transcription
+docs_dir: docs
+site_dir: site
+theme:
+  name: readthedocs
+markdown_extensions:
+  - admonition
+  - tables
+  - toc:
+      permalink: true
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Overview: getting-started/overview.md
+      - Installation: getting-started/installation.md
+      - Quickstart: getting-started/quickstart.md
+  - Usage:
+      - CLI Overview: usage/cli-overview.md
+      - Commands: usage/commands.md
+      - Output Artifacts: usage/output-artifacts.md
+      - Artifact Examples: usage/artifact-examples.md
+      - Input Preparation: usage/input-preparation.md
+  - Architecture:
+      - System Overview: architecture/system-overview.md
+      - Processing Flow: architecture/processing-flow.md
+  - Development:
+      - Local Development: development/local-development.md
+      - Release Process: development/release-process.md
+      - Publishing Docs: development/publishing-docs.md
