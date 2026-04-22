@@ -17,7 +17,7 @@ It is built in Swift, uses FluidAudio directly as a package dependency, and prod
 - Platform: macOS 14+
 - Language/toolchain: Swift 6 / Swift Package Manager
 - Audio engine: FluidAudio `0.13.6`
-- CLI version: `202604.1`
+- CLI version: `202604.2`
 - Output schema version: `1.0.0-draft`
 
 ## Quick Start

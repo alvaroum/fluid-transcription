@@ -22,6 +22,8 @@ Example:
 v202604.1
 ```
 
+If a tag is already pushed and you need to fix the workflow or packaging, publish the next iteration instead of rewriting an existing release tag.
+
 ## Current Release Steps
 
 1. Build the Swift package
@@ -46,7 +48,7 @@ release/
 - The packaged binary name is `fluid-transcription`.
 - The SwiftPM target name remains `FluidTranscriptionCLI`.
 - Models are not bundled into the release artifact.
-- The first public release for this repository follows the tag `v202604.1`.
+- The current public release line for this repository is `v202604.2`.
 
 ## Suggested Future Enhancements
 
