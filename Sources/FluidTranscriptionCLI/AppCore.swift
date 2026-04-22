@@ -199,6 +199,7 @@ enum AppError: LocalizedError {
     case invalidInput(String)
     case outputExists(String)
     case validationFailed([String])
+    case inputPreparationFailed(String)
 
     var errorDescription: String? {
         switch self {
@@ -208,6 +209,8 @@ enum AppError: LocalizedError {
             return message
         case let .validationFailed(errors):
             return errors.joined(separator: "\n")
+        case let .inputPreparationFailed(message):
+            return message
         }
     }
 }

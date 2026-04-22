@@ -4,3 +4,5 @@
 release/
 dist/
 vendor/
+test-inputs/
+test-runs/

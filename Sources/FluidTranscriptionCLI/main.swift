@@ -5,16 +5,36 @@ import Foundation
 struct FluidTranscriptionCLI: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: AppConstants.appName,
-        abstract: "macOS CLI for transcription and speaker diarization built directly on FluidAudio.",
+                abstract: "Native macOS CLI for transcription, speaker diarization, and combined processing.",
+                discussion: """
+                Capabilities:
+                    - `transcribe`: speech-to-text only
+                    - `diarize`: speaker diarization only
+                    - `process`: transcription plus diarization in one run
+                    - `validate`: schema validation for a generated run directory
+
+                Input handling:
+                    - Accepts audio or video files.
+                    - Automatically normalizes fragile or compressed inputs to an internal PCM WAV when needed.
+                    - Uses native AVFoundation decoding first and falls back to ffmpeg when available.
+
+                Output model:
+                    - Machine-readable JSON artifacts for AI agents
+                    - Optional Markdown summary artifact for combined runs
+                    - Deterministic run directories under the output folder
+
+                Typical use:
+                    fluid-transcription process --input meeting.m4a --output ./runs
+                """,
         subcommands: [VersionCommand.self, TranscribeCommand.self, DiarizeCommand.self, ProcessCommand.self, ValidateCommand.self]
     )
 }
 
 struct CommonRunOptions: ParsableArguments {
-    @Option(help: "Path to the input audio or video file.")
+        @Option(help: "Path to the input audio or video file. Compressed inputs are normalized automatically before processing when needed.")
     var input: String
 
-    @Option(help: "Directory where the run folder should be created.")
+        @Option(help: "Directory where the run folder and output artifacts should be created.")
     var output: String
 
     @Option(name: .customLong("job-id"), help: "Optional explicit job identifier.")
@@ -39,7 +59,11 @@ enum TranscriptModelArgument: String, ExpressibleByArgument {
 }
 
 struct VersionCommand: ParsableCommand {
-    static let configuration = CommandConfiguration(commandName: "version", abstract: "Print app and FluidAudio version information.")
+    static let configuration = CommandConfiguration(
+        commandName: "version",
+        abstract: "Print app, schema, and FluidAudio version information.",
+        discussion: "Emits a compact JSON object describing the CLI version, schema version, and FluidAudio version used by the current build."
+    )
 
     mutating func run() throws {
         let payload = VersionArtifact(
@@ -54,7 +78,18 @@ struct VersionCommand: ParsableCommand {
 }
 
 struct TranscribeCommand: ParsableCommand {
-    static let configuration = CommandConfiguration(commandName: "transcribe", abstract: "Transcribe an input file with FluidAudio ASR.")
+    static let configuration = CommandConfiguration(
+        commandName: "transcribe",
+        abstract: "Transcribe an input file to JSON text artifacts.",
+        discussion: """
+        Produces a run directory containing:
+          - `run.json`
+          - `events.jsonl`
+          - `transcript.json`
+
+        Use this when you need speech-to-text only.
+        """
+    )
 
     @OptionGroup var common: CommonRunOptions
     @Option(name: .customLong("model-version"), help: "ASR model version to use: v2 for English-only, v3 for multilingual.")
@@ -69,15 +104,20 @@ struct TranscribeCommand: ParsableCommand {
 
         try runBlocking {
             let context = try makeJobContext(inputPath: input, outputPath: output, jobID: jobID, overwrite: overwrite, mode: .transcribe)
+            let preparedInput = try InputPreparation.prepareForSynchronousCLI(url: context.inputURL)
+            defer { preparedInput.cleanup() }
             let engine = FluidTranscriptionEngine()
             var events = [EventRecord(timestamp: timestampNow(), event: "job_started", details: ["mode": RunMode.transcribe.rawValue])]
+            if let strategy = preparedInput.normalizationStrategy {
+                events.append(EventRecord(timestamp: timestampNow(), event: "input_prepared", details: ["strategy": strategy]))
+            }
 
             do {
-                var transcript = try await engine.transcribe(inputURL: context.inputURL, modelVersion: selectedModel)
+                var transcript = try await engine.transcribe(inputURL: preparedInput.processingURL, modelVersion: selectedModel)
                 transcript = TranscriptArtifact(
                     schemaVersion: transcript.schemaVersion,
                     jobID: context.jobID,
-                    input: transcript.input,
+                    input: context.inputURL.path,
                     language: transcript.language,
                     durationSec: transcript.durationSec,
                     toolVersions: transcript.toolVersions,
@@ -97,7 +137,18 @@ struct TranscribeCommand: ParsableCommand {
 }
 
 struct DiarizeCommand: ParsableCommand {
-    static let configuration = CommandConfiguration(commandName: "diarize", abstract: "Run offline speaker diarization on an input file.")
+    static let configuration = CommandConfiguration(
+        commandName: "diarize",
+        abstract: "Detect speaker turns and speaker totals for an input file.",
+        discussion: """
+        Produces a run directory containing:
+          - `run.json`
+          - `events.jsonl`
+          - `diarization.json`
+
+        Use this when you need speaker timing without transcript text.
+        """
+    )
 
     @OptionGroup var common: CommonRunOptions
 
@@ -109,15 +160,20 @@ struct DiarizeCommand: ParsableCommand {
 
         try runBlocking {
             let context = try makeJobContext(inputPath: input, outputPath: output, jobID: jobID, overwrite: overwrite, mode: .diarize)
+            let preparedInput = try InputPreparation.prepareForSynchronousCLI(url: context.inputURL)
+            defer { preparedInput.cleanup() }
             let engine = FluidTranscriptionEngine()
             var events = [EventRecord(timestamp: timestampNow(), event: "job_started", details: ["mode": RunMode.diarize.rawValue])]
+            if let strategy = preparedInput.normalizationStrategy {
+                events.append(EventRecord(timestamp: timestampNow(), event: "input_prepared", details: ["strategy": strategy]))
+            }
 
             do {
-                var diarization = try await engine.diarize(inputURL: context.inputURL)
+                var diarization = try await engine.diarize(inputURL: preparedInput.processingURL)
                 diarization = DiarizationArtifact(
                     schemaVersion: diarization.schemaVersion,
                     jobID: context.jobID,
-                    input: diarization.input,
+                    input: context.inputURL.path,
                     durationSec: diarization.durationSec,
                     toolVersions: diarization.toolVersions,
                     speakers: diarization.speakers,
@@ -135,7 +191,22 @@ struct DiarizeCommand: ParsableCommand {
 }
 
 struct ProcessCommand: ParsableCommand {
-    static let configuration = CommandConfiguration(commandName: "process", abstract: "Transcribe and diarize the input in one command.")
+    static let configuration = CommandConfiguration(
+        commandName: "process",
+        abstract: "Run transcription and diarization together in one command.",
+        discussion: """
+        Produces a run directory containing:
+          - `run.json`
+          - `events.jsonl`
+          - `transcript.json`
+          - `diarization.json`
+          - `combined.json`
+          - `combined.md`
+
+        This is the main end-to-end command for AI-agent workflows.
+        It accepts original media files directly and normalizes them automatically before model execution when required.
+        """
+    )
 
     @OptionGroup var common: CommonRunOptions
     @Option(name: .customLong("model-version"), help: "ASR model version to use: v2 for English-only, v3 for multilingual.")
@@ -150,15 +221,20 @@ struct ProcessCommand: ParsableCommand {
 
         try runBlocking {
             let context = try makeJobContext(inputPath: input, outputPath: output, jobID: jobID, overwrite: overwrite, mode: .process)
+            let preparedInput = try InputPreparation.prepareForSynchronousCLI(url: context.inputURL)
+            defer { preparedInput.cleanup() }
             let engine = FluidTranscriptionEngine()
             var events = [EventRecord(timestamp: timestampNow(), event: "job_started", details: ["mode": RunMode.process.rawValue])]
+            if let strategy = preparedInput.normalizationStrategy {
+                events.append(EventRecord(timestamp: timestampNow(), event: "input_prepared", details: ["strategy": strategy]))
+            }
 
             do {
-                var transcript = try await engine.transcribe(inputURL: context.inputURL, modelVersion: selectedModel)
+                var transcript = try await engine.transcribe(inputURL: preparedInput.processingURL, modelVersion: selectedModel)
                 transcript = TranscriptArtifact(
                     schemaVersion: transcript.schemaVersion,
                     jobID: context.jobID,
-                    input: transcript.input,
+                    input: context.inputURL.path,
                     language: transcript.language,
                     durationSec: transcript.durationSec,
                     toolVersions: transcript.toolVersions,
@@ -166,11 +242,11 @@ struct ProcessCommand: ParsableCommand {
                     fullText: transcript.fullText,
                     notes: transcript.notes
                 )
-                var diarization = try await engine.diarize(inputURL: context.inputURL)
+                var diarization = try await engine.diarize(inputURL: preparedInput.processingURL)
                 diarization = DiarizationArtifact(
                     schemaVersion: diarization.schemaVersion,
                     jobID: context.jobID,
-                    input: diarization.input,
+                    input: context.inputURL.path,
                     durationSec: diarization.durationSec,
                     toolVersions: diarization.toolVersions,
                     speakers: diarization.speakers,
@@ -197,7 +273,11 @@ struct ProcessCommand: ParsableCommand {
 }
 
 struct ValidateCommand: ParsableCommand {
-    static let configuration = CommandConfiguration(commandName: "validate", abstract: "Validate a previously generated run directory.")
+    static let configuration = CommandConfiguration(
+        commandName: "validate",
+        abstract: "Validate a previously generated run directory.",
+        discussion: "Checks that expected artifacts exist and that the run directory conforms to the CLI output contract."
+    )
 
     @Option(name: .customLong("run-dir"), help: "Path to the run directory produced by the app.")
     var runDirectory: String
