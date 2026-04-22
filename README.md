@@ -17,35 +17,51 @@ It is built in Swift, uses FluidAudio directly as a package dependency, and prod
 - Platform: macOS 14+
 - Language/toolchain: Swift 6 / Swift Package Manager
 - Audio engine: FluidAudio `0.13.6`
-- CLI version: `202604.2`
+- CLI version: `202604.3`
 - Output schema version: `1.0.0-draft`
+
+## Install
+
+### Direct download
+
+```bash
+# Download the .pkg from the latest GitHub release and open it.
+# It installs fluid-transcription into /usr/local/bin.
+open https://github.com/alvaroum/fluid-transcription/releases/latest
+```
+
+### Homebrew
+
+```bash
+brew install alvaroum/tap/fluid-transcription
+```
+
+### Optional codec fallback
+
+```bash
+brew install ffmpeg
+```
 
 ## Quick Start
 
-### 1. Build
+### 1. Check the CLI surface
 
 ```bash
-swift build -c release
+fluid-transcription --help
 ```
 
-### 2. Check the CLI surface
+### 2. Run a full processing job
 
 ```bash
-./.build/release/FluidTranscriptionCLI --help
-```
-
-### 3. Run a full processing job
-
-```bash
-./.build/release/FluidTranscriptionCLI process \
+fluid-transcription process \
   --input ./meeting.m4a \
   --output ./runs
 ```
 
-### 4. Validate the generated run
+### 3. Validate the generated run
 
 ```bash
-./.build/release/FluidTranscriptionCLI validate \
+fluid-transcription validate \
   --run-dir ./runs/<job-id>
 ```
 
@@ -123,7 +139,7 @@ swift build
 ### GitHub workflows
 
 - `.github/workflows/test.yml`: build and smoke-check the package
-- `.github/workflows/release.yml`: build, package, checksum, and publish tagged releases
+- `.github/workflows/release.yml`: build, package, checksum, and publish tagged releases, including a `.pkg` installer and Homebrew-ready tarball
 - `.github/workflows/docs.yml`: build and deploy the documentation site to GitHub Pages
 
 ## Documentation

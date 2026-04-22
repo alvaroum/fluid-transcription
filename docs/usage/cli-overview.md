@@ -6,7 +6,7 @@ The application command name is:
 fluid-transcription
 ```
 
-Within the repository, the built binary path is:
+For local development inside the repository, the release build path is:
 
 ```bash
 ./.build/release/FluidTranscriptionCLI

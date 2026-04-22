@@ -1,15 +1,15 @@
 # Quickstart
 
-## Build
+## Install
 
 ```bash
-swift build -c release
+fluid-transcription --help
 ```
 
 ## Run the main workflow
 
 ```bash
-./.build/release/FluidTranscriptionCLI process \
+fluid-transcription process \
   --input ./meeting.m4a \
   --output ./runs
 ```
@@ -30,7 +30,7 @@ Typical contents:
 ## Validate the run
 
 ```bash
-./.build/release/FluidTranscriptionCLI validate \
+fluid-transcription validate \
   --run-dir ./runs/<job-id>
 ```
 
@@ -39,7 +39,7 @@ Typical contents:
 Transcription only:
 
 ```bash
-./.build/release/FluidTranscriptionCLI transcribe \
+fluid-transcription transcribe \
   --input ./meeting.m4a \
   --output ./runs
 ```
@@ -47,7 +47,7 @@ Transcription only:
 Diarization only:
 
 ```bash
-./.build/release/FluidTranscriptionCLI diarize \
+fluid-transcription diarize \
   --input ./meeting.m4a \
   --output ./runs
 ```

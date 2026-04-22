@@ -14,7 +14,7 @@ This documentation is structured as a future documentation site rather than a si
 ## Start Here
 
 - Read [Getting Started Overview](getting-started/overview.md) for the product scope.
-- Read [Installation](getting-started/installation.md) to build the CLI locally.
+- Read [Installation](getting-started/installation.md) to install the CLI from a GitHub release or Homebrew.
 - Read [Quickstart](getting-started/quickstart.md) for the shortest usable path.
 
 ## Main User Topics

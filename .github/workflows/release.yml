@@ -24,6 +24,19 @@ jobs:
           mkdir -p release/bin
           cp .build/release/FluidTranscriptionCLI release/bin/fluid-transcription
           chmod +x release/bin/fluid-transcription
+      - name: Build installer package
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          ARCH="$(uname -m)"
+          mkdir -p pkgroot/usr/local/bin
+          cp release/bin/fluid-transcription pkgroot/usr/local/bin/fluid-transcription
+          chmod 755 pkgroot/usr/local/bin/fluid-transcription
+          pkgbuild \
+            --root pkgroot \
+            --identifier com.alvaroum.fluid-transcription \
+            --version "$VERSION" \
+            --install-location / \
+            "release/fluid-transcription-${VERSION}-macos-${ARCH}.pkg"
       - name: Create release archive
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
@@ -32,7 +45,7 @@ jobs:
       - name: Generate checksums
         run: |
           cd release
-          shasum -a 256 ./*.tar.gz > SHA256SUMS
+          shasum -a 256 ./*.pkg ./*.tar.gz > SHA256SUMS
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
