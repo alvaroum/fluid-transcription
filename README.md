@@ -30,10 +30,13 @@ It is built in Swift, uses FluidAudio directly as a package dependency, and prod
 open https://github.com/alvaroum/fluid-transcription/releases/latest
 ```
 
+The installer package is not signed or notarized yet, so macOS may require a one-time confirmation in Privacy & Security before installation.
+
 ### Homebrew
 
 ```bash
-brew install alvaroum/tap/fluid-transcription
+brew tap alvaroum/tap
+brew install fluid-transcription
 ```
 
 ### Optional codec fallback
