@@ -1,0 +1,49 @@
+{
+  "dependencies" : [
+    {
+      "identity" : "fluidaudio",
+      "packageURL" : "https://github.com/FluidInference/FluidAudio.git",
+      "syncs" : [
+        {
+          "kind" : "files",
+          "paths" : [
+            "Sources/FluidTranscriptionCLI/AppCore.swift"
+          ],
+          "pattern" : "(static let fluidAudioVersion = \")[^\"]+(\")",
+          "replacement" : "$1{{version}}$2"
+        },
+        {
+          "kind" : "files",
+          "paths" : [
+            "README.md"
+          ],
+          "pattern" : "(- Audio engine: FluidAudio `)[^`]+(`)",
+          "replacement" : "$1{{version}}$2"
+        },
+        {
+          "kind" : "files",
+          "paths" : [
+            "docs/usage/artifact-examples.md"
+          ],
+          "pattern" : "(\\\"fluidAudioVersion\\\"\\s*:\\s*\\\")[^\\\"]+(\\\")",
+          "replacement" : "$1{{version}}$2"
+        },
+        {
+          "kind" : "tree",
+          "root" : "test-runs",
+          "required" : false,
+          "fileExtensions" : [
+            "json"
+          ],
+          "pattern" : "(\\\"fluidAudioVersion\\\"\\s*:\\s*\\\")[^\\\"]+(\\\")",
+          "replacement" : "$1{{version}}$2"
+        }
+      ]
+    },
+    {
+      "identity" : "swift-argument-parser",
+      "packageURL" : "https://github.com/apple/swift-argument-parser.git",
+      "syncs" : []
+    }
+  ]
+}

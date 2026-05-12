@@ -20,7 +20,8 @@ struct FluidTranscriptionEngine {
         let models = try await AsrModels.downloadAndLoad(version: modelVersion.fluidAudioValue)
         let manager = AsrManager()
         try await manager.loadModels(models)
-        let result = try await manager.transcribe(inputURL, source: .system)
+        var decoderState = TdtDecoderState.make(decoderLayers: await manager.decoderLayerCount)
+        let result = try await manager.transcribe(inputURL, decoderState: &decoderState)
 
         return TranscriptArtifact(
             schemaVersion: AppConstants.schemaVersion,

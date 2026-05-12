@@ -16,8 +16,8 @@ It is built in Swift, uses FluidAudio directly as a package dependency, and prod
 
 - Platform: macOS 14+
 - Language/toolchain: Swift 6 / Swift Package Manager
-- Audio engine: FluidAudio `0.13.6`
-- CLI version: `202604.4`
+- Audio engine: FluidAudio `0.14.5`
+- CLI version: `202604.5`
 - Output schema version: `1.0.0-draft`
 
 ## Install
@@ -28,6 +28,11 @@ It is built in Swift, uses FluidAudio directly as a package dependency, and prod
 # Download the .pkg from the latest GitHub release and open it.
 # It installs ft into /usr/local/bin and also adds a fluid-transcription compatibility alias.
 open https://github.com/alvaroum/fluid-transcription/releases/latest
+swift build
+./.build/debug/FluidTranscriptionCLI version
+./.build/debug/FluidTranscriptionCLI --help
+```
+
 ```
 
 The installer package is not signed or notarized yet, so macOS may require a one-time confirmation in Privacy & Security before installation.
@@ -141,6 +146,23 @@ Artifacts are designed for both human review and automation:
 swift build
 ./.build/debug/FluidTranscriptionCLI version
 ./.build/debug/FluidTranscriptionCLI process --help
+```
+
+### Dependency maintenance
+
+When a SwiftPM dependency needs to move to a known target version, use the repo script instead of manually editing source, docs, and sample artifacts:
+
+```bash
+./scripts/update-swiftpm-dependency.swift fluidaudio 0.14.5
+```
+
+This updates the declared requirement in `Package.swift`, runs `swift package resolve`, and then syncs any mirrored version strings configured in `scripts/dependency-sync.json`.
+
+After running it, verify:
+
+```bash
+swift build
+./.build/debug/FluidTranscriptionCLI version
 ```
 
 ### GitHub workflows

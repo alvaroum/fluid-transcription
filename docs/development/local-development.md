@@ -40,6 +40,18 @@ Run validation:
 - `site/` is ignored because it is the generated documentation output directory.
 - The public Homebrew tap is `alvaroum/fluid-transcription`, backed by the repository `alvaroum/homebrew-fluid-transcription`.
 
+## Dependency Updates
+
+For SwiftPM dependency bumps, prefer the repo script instead of manually editing source and docs:
+
+```bash
+./scripts/update-swiftpm-dependency.swift fluidaudio 0.14.5
+```
+
+The script updates `Package.swift`, resolves the package graph, and syncs any mirrored version strings defined in `scripts/dependency-sync.json`.
+
+It does not fix upstream API changes automatically, so still run the normal verification loop afterward.
+
 ## What To Verify After CLI Changes
 
 - build succeeds in debug and release

@@ -42,8 +42,8 @@ Examples below are intentionally shortened and sanitized.
   "input": "/path/to/meeting.m4a",
   "language": "auto",
   "tool_versions": {
-    "appVersion": "202604.4",
-    "fluidAudioVersion": "0.13.6"
+    "appVersion": "202604.5",
+    "fluidAudioVersion": "0.14.5"
   },
   "segments": [
     {
@@ -69,8 +69,8 @@ Examples below are intentionally shortened and sanitized.
   "input": "/path/to/meeting.m4a",
   "duration_sec": 321.4,
   "tool_versions": {
-    "appVersion": "202604.4",
-    "fluidAudioVersion": "0.13.6"
+    "appVersion": "202604.5",
+    "fluidAudioVersion": "0.14.5"
   },
   "speakers": [
     {
@@ -101,8 +101,8 @@ Examples below are intentionally shortened and sanitized.
   "job_id": "meeting-a1b2c3d4e5f6",
   "input": "/path/to/meeting.m4a",
   "tool_versions": {
-    "appVersion": "202604.4",
-    "fluidAudioVersion": "0.13.6"
+    "appVersion": "202604.5",
+    "fluidAudioVersion": "0.14.5"
   },
   "summary": {
     "duration_sec": 321.4,

@@ -5,9 +5,9 @@ enum AppConstants {
     static let appName = "fluid-transcription"
     static let commandName = "ft"
     static let legacyCommandName = "fluid-transcription"
-    static let appVersion = "202604.4"
+    static let appVersion = "202604.5"
     static let schemaVersion = "1.0.0-draft"
-    static let fluidAudioVersion = "0.13.6"
+    static let fluidAudioVersion = "0.14.5"
 }
 
 enum RunMode: String, Codable {
