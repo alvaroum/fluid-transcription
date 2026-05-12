@@ -16,8 +16,9 @@ The repository now includes a GitHub Pages workflow that:
 
 - installs MkDocs
 - builds the documentation site from `docs/`
-- uploads the generated `site/` output as a Pages artifact
-- deploys it using GitHub Pages
+- uploads the generated `site/` output as a Pages artifact when GitHub Pages is enabled
+- deploys it using GitHub Pages when GitHub Pages is enabled
+- otherwise skips the deployment steps cleanly so the workflow does not fail on repositories without Pages configured
 
 ## Local Preview
 
