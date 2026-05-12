@@ -1,6 +1,8 @@
 .build/
 .swiftpm/
 .DS_Store
+*.code-workspace
+graphify-out/
 release/
 dist/
 vendor/

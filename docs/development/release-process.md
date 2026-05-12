@@ -33,7 +33,9 @@ If a tag is already pushed and you need to fix the workflow or packaging, publis
 5. Build a macOS installer package that installs into `/usr/local/bin`
 6. Create a Homebrew-ready tarball
 7. Generate SHA256 checksums for both distributables
-8. Publish the GitHub release assets
+8. Generate the matching Homebrew formula
+9. Update the Homebrew tap repository when the release token is available
+10. Publish the GitHub release assets
 
 ## Produced Release Assets
 
@@ -41,6 +43,7 @@ If a tag is already pushed and you need to fix the workflow or packaging, publis
 release/
   fluid-transcription-<version>-macos-arm64.pkg
   fluid-transcription-<version>-macos-arm64.tar.gz
+  fluid-transcription.rb
   SHA256SUMS
 ```
 
@@ -59,6 +62,7 @@ release/
 - The release artifacts also include `fluid-transcription` as a compatibility symlink.
 - The SwiftPM target name remains `FluidTranscriptionCLI`.
 - The Homebrew tap name is `alvaroum/fluid-transcription`, backed by the repository `alvaroum/homebrew-fluid-transcription`.
+- The release workflow updates the tap automatically when the repository secret `HOMEBREW_TAP_TOKEN` is configured with write access to `alvaroum/homebrew-fluid-transcription`.
 - Direct downloads should use the `.pkg` installer; the tarball is primarily for Homebrew and advanced manual installation.
 - Models are not bundled into the release artifact.
 - The current public release line for this repository is `v202604.5`.
@@ -69,7 +73,6 @@ release/
 ## Suggested Future Enhancements
 
 - Apple Developer signing and notarization for the installer package
-- automated Homebrew tap updates
 - release notes generation
 - changelog automation
 - docs-site deployment on tagged releases

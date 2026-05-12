@@ -46,6 +46,8 @@ brew install fluid-transcription
 
 This uses the app-specific Homebrew tap backed by the repository `alvaroum/homebrew-fluid-transcription`.
 
+Tagged releases generate the Homebrew formula automatically and publish it as a release asset; the release workflow also updates the tap repository when the `HOMEBREW_TAP_TOKEN` secret is configured.
+
 ### Optional codec fallback
 
 ```bash
@@ -168,7 +170,7 @@ swift build
 ### GitHub workflows
 
 - `.github/workflows/test.yml`: build and smoke-check the package
-- `.github/workflows/release.yml`: build, package, checksum, and publish tagged releases, including a `.pkg` installer and Homebrew-ready tarball
+- `.github/workflows/release.yml`: build, package, checksum, and publish tagged releases, including a `.pkg` installer, Homebrew-ready tarball, and Homebrew formula sync
 - `.github/workflows/docs.yml`: build and deploy the documentation site to GitHub Pages
 
 ## Documentation

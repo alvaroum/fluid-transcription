@@ -36,7 +36,7 @@ Run validation:
 
 ## Repository Notes
 
-- `test-inputs/` and `test-runs/` are ignored because they are local artifacts.
+- `test-inputs/`, `test-runs/`, `graphify-out/`, and local `*.code-workspace` files are ignored because they are local artifacts.
 - `site/` is ignored because it is the generated documentation output directory.
 - The public Homebrew tap is `alvaroum/fluid-transcription`, backed by the repository `alvaroum/homebrew-fluid-transcription`.
 

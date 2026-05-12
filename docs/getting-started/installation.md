@@ -45,6 +45,8 @@ brew install fluid-transcription
 
 This installs the same release binary into Homebrew's managed prefix and exposes both `ft` and `fluid-transcription` on `PATH`.
 
+Each tagged release also publishes the matching Homebrew formula as a release asset and is intended to update the public tap automatically.
+
 Current note:
 
 - Homebrew installation is Apple Silicon only for now because the published binary artifacts are `macos-arm64`.
@@ -88,6 +90,7 @@ Tagged releases are packaged by GitHub Actions into:
 
 - a macOS installer package: `fluid-transcription-<version>-macos-arm64.pkg`
 - a Homebrew-ready tarball: `fluid-transcription-<version>-macos-arm64.tar.gz`
+- a Homebrew formula: `fluid-transcription.rb`
 - `SHA256SUMS`
 
 See [Release Process](../development/release-process.md) for details.

@@ -11,6 +11,8 @@ permissions:
 jobs:
   build-release:
     runs-on: macos-latest
+    env:
+      HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -50,6 +52,30 @@ jobs:
         run: |
           cd release
           shasum -a 256 ./*.pkg ./*.tar.gz > SHA256SUMS
+      - name: Capture release metadata
+        id: release-metadata
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          ARCH="$(uname -m)"
+          TARBALL="fluid-transcription-${VERSION}-macos-${ARCH}.tar.gz"
+          SHA256="$(shasum -a 256 "release/${TARBALL}" | awk '{print $1}')"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "arch=${ARCH}" >> "$GITHUB_OUTPUT"
+          echo "tarball=${TARBALL}" >> "$GITHUB_OUTPUT"
+          echo "sha256=${SHA256}" >> "$GITHUB_OUTPUT"
+      - name: Generate Homebrew formula
+        run: |
+          ./scripts/render-homebrew-formula.sh \
+            "${{ steps.release-metadata.outputs.version }}" \
+            "${{ steps.release-metadata.outputs.sha256 }}" \
+            > release/fluid-transcription.rb
+      - name: Update Homebrew tap
+        if: env.HOMEBREW_TAP_TOKEN != ''
+        run: |
+          ./scripts/update-homebrew-tap.sh \
+            "${{ steps.release-metadata.outputs.version }}" \
+            "${{ steps.release-metadata.outputs.sha256 }}" \
+            alvaroum/homebrew-fluid-transcription
       - name: Generate release notes
         run: ./scripts/generate-release-notes.sh "$GITHUB_REF_NAME" release-notes.md
       - name: Publish GitHub release
@@ -59,4 +85,5 @@ jobs:
           files: |
             release/*.pkg
             release/*.tar.gz
+            release/fluid-transcription.rb
             release/SHA256SUMS
