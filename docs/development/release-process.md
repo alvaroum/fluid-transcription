@@ -63,6 +63,8 @@ release/
 - Models are not bundled into the release artifact.
 - The current public release line for this repository is `v202604.5`.
 - Update `CHANGELOG.md` before tagging a new release so the repository history ships with the version bump.
+- The release workflow now uses the matching `CHANGELOG.md` section as the GitHub release body when it exists.
+- If a matching changelog section is missing, the workflow falls back to generating release notes from commit subjects since the previous tag.
 
 ## Suggested Future Enhancements
 

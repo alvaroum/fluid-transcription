@@ -13,6 +13,8 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Build package
         run: swift build
       - name: Smoke-run version command
@@ -48,8 +50,13 @@ jobs:
         run: |
           cd release
           shasum -a 256 ./*.pkg ./*.tar.gz > SHA256SUMS
+      - name: Generate release notes
+        run: ./scripts/generate-release-notes.sh "$GITHUB_REF_NAME" release-notes.md
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
+          body_path: release-notes.md
           files: |
-            release/*
+            release/*.pkg
+            release/*.tar.gz
+            release/SHA256SUMS

@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Added automated GitHub release notes generation from `CHANGELOG.md`, with a commit-history fallback in the release workflow.
+
 ## v202604.5 - 2026-05-12
 
 - Upgraded the FluidAudio dependency to `0.14.5` and adapted the transcription path to the current decoder-state API.
