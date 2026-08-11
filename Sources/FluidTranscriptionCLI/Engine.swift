@@ -15,6 +15,16 @@ enum TranscriptModelVersion: String, Codable, CaseIterable {
     }
 }
 
+func makeWordArtifacts(from tokenTimings: [TokenTiming]) -> [TranscriptWordArtifact] {
+    buildWordTimings(from: tokenTimings).map { timing in
+        TranscriptWordArtifact(
+            text: timing.word,
+            startSec: timing.startTime,
+            endSec: timing.endTime
+        )
+    }
+}
+
 struct FluidTranscriptionEngine {
     func transcribe(inputURL: URL, modelVersion: TranscriptModelVersion) async throws -> TranscriptArtifact {
         let models = try await AsrModels.downloadAndLoad(version: modelVersion.fluidAudioValue)
