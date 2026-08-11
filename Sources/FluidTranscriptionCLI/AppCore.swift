@@ -57,12 +57,41 @@ struct RunArtifact: Codable {
     }
 }
 
+struct TranscriptWordArtifact: Codable {
+    let text: String
+    let startSec: Double
+    let endSec: Double
+
+    enum CodingKeys: String, CodingKey {
+        case text
+        case startSec = "start_sec"
+        case endSec = "end_sec"
+    }
+}
+
 struct TranscriptSegmentArtifact: Codable {
     let segmentID: String
     let startSec: Double?
     let endSec: Double?
     let text: String
     let confidence: Double?
+    let words: [TranscriptWordArtifact]?
+
+    init(
+        segmentID: String,
+        startSec: Double?,
+        endSec: Double?,
+        text: String,
+        confidence: Double?,
+        words: [TranscriptWordArtifact]? = nil
+    ) {
+        self.segmentID = segmentID
+        self.startSec = startSec
+        self.endSec = endSec
+        self.text = text
+        self.confidence = confidence
+        self.words = words
+    }
 
     enum CodingKeys: String, CodingKey {
         case segmentID = "segment_id"
@@ -70,6 +99,7 @@ struct TranscriptSegmentArtifact: Codable {
         case endSec = "end_sec"
         case text
         case confidence
+        case words
     }
 }
 
