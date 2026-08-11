@@ -50,6 +50,7 @@ The CLI is designed to emit:
 
 - ASR models are downloaded automatically on first use and then cached by FluidAudio.
 - `transcribe` and `process` support model version selection.
+- Both commands accept `--word-timestamps` for optional timed words in `transcript.json`.
 - `v2` is English-only.
 - `v3` is multilingual and the default.
 

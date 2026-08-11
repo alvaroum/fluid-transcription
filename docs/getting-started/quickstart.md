@@ -44,6 +44,15 @@ ft transcribe \
   --output ./runs
 ```
 
+Transcription with approximate word timings:
+
+```bash
+ft transcribe \
+  --input ./meeting.m4a \
+  --output ./runs \
+  --word-timestamps
+```
+
 Diarization only:
 
 ```bash

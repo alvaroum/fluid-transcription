@@ -27,7 +27,7 @@ Examples below are intentionally shortened and sanitized.
 ## `events.jsonl`
 
 ```json
-{"event":"job_started","timestamp":"2026-04-22T10:52:30Z","details":{"mode":"process"}}
+{"event":"job_started","timestamp":"2026-04-22T10:52:30Z","details":{"mode":"process","word_timestamps":"false"}}
 {"event":"input_prepared","timestamp":"2026-04-22T10:52:30Z","details":{"strategy":"avfoundation"}}
 {"event":"artifact_written","timestamp":"2026-04-22T10:53:35Z","details":{"artifact":"transcript.json"}}
 {"event":"job_completed","timestamp":"2026-04-22T10:53:35Z","details":{"status":"completed"}}
@@ -41,6 +41,7 @@ Examples below are intentionally shortened and sanitized.
   "job_id": "meeting-a1b2c3d4e5f6",
   "input": "/path/to/meeting.m4a",
   "language": "auto",
+  "duration_sec": 321.4,
   "tool_versions": {
     "appVersion": "202604.5",
     "fluidAudioVersion": "0.15.5"
@@ -55,10 +56,36 @@ Examples below are intentionally shortened and sanitized.
   "full_text": "Example transcript text...",
   "notes": [
     "ASR models are downloaded automatically on first use and cached by FluidAudio.",
-    "Initial Swift CLI integration emits a single transcript segment until richer ASR timing extraction is added."
+    "The transcript currently contains one coarse segment."
   ]
 }
 ```
+
+When `--word-timestamps` is used, the segment includes timed words and adopts the first and last word boundaries:
+
+```json
+{
+  "segment_id": "seg-0001",
+  "start_sec": 0.0,
+  "end_sec": 1.28,
+  "text": "Example transcript",
+  "confidence": 0.93,
+  "words": [
+    {
+      "text": "Example",
+      "start_sec": 0.0,
+      "end_sec": 0.48
+    },
+    {
+      "text": "transcript",
+      "start_sec": 0.56,
+      "end_sec": 1.28
+    }
+  ]
+}
+```
+
+These values are approximate decoder-derived timings. If timing was requested but unavailable, `words` is an empty array and the segment bounds remain absent.
 
 ## `diarization.json`
 

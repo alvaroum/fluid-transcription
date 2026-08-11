@@ -33,6 +33,17 @@ ft transcribe \
   --model-version v3
 ```
 
+Add `--word-timestamps` to include approximate word-level start and end times in `transcript.json`:
+
+```bash
+ft transcribe \
+  --input ./meeting.m4a \
+  --output ./runs \
+  --word-timestamps
+```
+
+The `words` field is absent when the flag is omitted.
+
 ## `diarize`
 
 Runs speaker diarization and writes:
@@ -68,6 +79,8 @@ ft process \
   --output ./runs \
   --overwrite
 ```
+
+`process` also accepts `--word-timestamps`. Timed words are written to the canonical `transcript.json` artifact rather than duplicated in `combined.json`.
 
 ## `validate`
 

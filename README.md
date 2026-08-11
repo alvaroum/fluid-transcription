@@ -7,6 +7,7 @@ It is built in Swift, uses FluidAudio directly as a package dependency, and prod
 ## What It Does
 
 - Transcribes audio or video files to text.
+- Optionally includes approximate word-level start and end times.
 - Detects speaker turns and aggregates speaker talk time.
 - Runs both tasks together in one `process` command.
 - Validates previously generated run directories.
@@ -70,6 +71,15 @@ ft process \
   --output ./runs
 ```
 
+Add `--word-timestamps` when `transcript.json` should include timed words:
+
+```bash
+ft process \
+  --input ./meeting.m4a \
+  --output ./runs \
+  --word-timestamps
+```
+
 ### 3. Validate the generated run
 
 ```bash
@@ -83,7 +93,7 @@ The release packages also install `fluid-transcription` as a compatibility alias
 
 ### `process`
 
-Runs transcription and diarization together and writes:
+Runs transcription and diarization together. Add `--word-timestamps` to include timed words in `transcript.json`. The command writes:
 
 - `run.json`
 - `events.jsonl`
@@ -94,7 +104,7 @@ Runs transcription and diarization together and writes:
 
 ### `transcribe`
 
-Runs speech-to-text only and writes:
+Runs speech-to-text only. Add `--word-timestamps` to include timed words in `transcript.json`. The command writes:
 
 - `run.json`
 - `events.jsonl`
@@ -135,7 +145,7 @@ Artifacts are designed for both human review and automation:
 
 - `run.json`: top-level run metadata and status
 - `events.jsonl`: lifecycle events such as `job_started`, `input_prepared`, and `job_completed`
-- `transcript.json`: transcript content and metadata
+- `transcript.json`: transcript content, metadata, and optional word timings
 - `diarization.json`: speaker summaries and turns
 - `combined.json`: merged high-level artifact for downstream consumers
 - `combined.md`: Markdown rendering of the combined result for human reading
@@ -195,7 +205,8 @@ This project is licensed under Apache License 2.0. See `LICENSE`.
 
 - macOS-only at the moment
 - Models are not bundled into the repository; FluidAudio downloads required models on first use
-- Transcript segmentation is currently coarse and emitted as a single segment until richer ASR timing extraction is added
+- Transcript segmentation is currently coarse and emitted as a single segment
+- Optional word timings are approximate decoder-derived values rather than forced alignment
 - Transcript-to-speaker alignment is not yet implemented beyond separate diarization turn output
 
 ## Documentation Follow-Ups

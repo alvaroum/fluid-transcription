@@ -10,9 +10,10 @@ For `process`, `transcribe`, and `diarize`, the high-level flow is:
 4. Emit `job_started`
 5. Prepare the input if normalization is needed
 6. Run model inference
-7. Write artifacts
-8. Emit completion or failure events
-9. Write `run.json`
+7. Optionally aggregate FluidAudio token timings into word timings
+8. Write artifacts
+9. Emit completion or failure events
+10. Write `run.json`
 
 ## `process` Command Flow
 
@@ -38,7 +39,8 @@ When a command fails after the run directory exists:
 - `run.json` is written with `status: failed`
 - the command exits with an error
 
-## Current Known Gaps
+## Current known gaps
 
-- transcript timing is not yet rich enough for transcript-to-speaker alignment
+- transcript output still uses one coarse segment
+- optional word timings are not yet assigned to diarized speakers
 - the schema is still draft and may evolve
