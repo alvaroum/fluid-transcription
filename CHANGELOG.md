@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+- Updated FluidAudio from `0.14.5` to `0.15.5` and swift-argument-parser from `1.7.1` to `1.8.2`.
 - Added automated GitHub release notes generation from `CHANGELOG.md`, with a commit-history fallback in the release workflow.
 
 ## v202604.5 - 2026-05-12

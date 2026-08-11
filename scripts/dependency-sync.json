@@ -23,6 +23,15 @@
         {
           "kind" : "files",
           "paths" : [
+            "README.md",
+            "docs/development/local-development.md"
+          ],
+          "pattern" : "(update-swiftpm-dependency\\.swift fluidaudio )[0-9]+(?:\\.[0-9]+)+",
+          "replacement" : "$1{{version}}"
+        },
+        {
+          "kind" : "files",
+          "paths" : [
             "docs/usage/artifact-examples.md"
           ],
           "pattern" : "(\\\"fluidAudioVersion\\\"\\s*:\\s*\\\")[^\\\"]+(\\\")",

@@ -16,7 +16,7 @@ It is built in Swift, uses FluidAudio directly as a package dependency, and prod
 
 - Platform: macOS 14+
 - Language/toolchain: Swift 6 / Swift Package Manager
-- Audio engine: FluidAudio `0.14.5`
+- Audio engine: FluidAudio `0.15.5`
 - CLI version: `202604.5`
 - Output schema version: `1.0.0-draft`
 
@@ -155,7 +155,7 @@ swift build
 When a SwiftPM dependency needs to move to a known target version, use the repo script instead of manually editing source, docs, and sample artifacts:
 
 ```bash
-./scripts/update-swiftpm-dependency.swift fluidaudio 0.14.5
+./scripts/update-swiftpm-dependency.swift fluidaudio 0.15.5
 ```
 
 This updates the declared requirement in `Package.swift`, runs `swift package resolve`, and then syncs any mirrored version strings configured in `scripts/dependency-sync.json`.

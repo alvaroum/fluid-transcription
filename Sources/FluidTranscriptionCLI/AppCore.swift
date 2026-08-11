@@ -7,7 +7,7 @@ enum AppConstants {
     static let legacyCommandName = "fluid-transcription"
     static let appVersion = "202604.5"
     static let schemaVersion = "1.0.0-draft"
-    static let fluidAudioVersion = "0.14.5"
+    static let fluidAudioVersion = "0.15.5"
 }
 
 enum RunMode: String, Codable {

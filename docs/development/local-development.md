@@ -45,7 +45,7 @@ Run validation:
 For SwiftPM dependency bumps, prefer the repo script instead of manually editing source and docs:
 
 ```bash
-./scripts/update-swiftpm-dependency.swift fluidaudio 0.14.5
+./scripts/update-swiftpm-dependency.swift fluidaudio 0.15.5
 ```
 
 The script updates `Package.swift`, resolves the package graph, and syncs any mirrored version strings defined in `scripts/dependency-sync.json`.
