@@ -34,6 +34,33 @@ struct WordTimingMappingTests {
         #expect(words.map(\.text) == ["Hello", "world"])
     }
 
+    @Test("Word timings are constrained to the audio bounds")
+    func constrainsWordTimingsToAudioBounds() {
+        let tokenTimings = [
+            token("▁Hello", start: -0.2, end: 0.4),
+            token("▁world", start: 0.8, end: 1.4),
+        ]
+
+        let words = makeWordArtifacts(from: tokenTimings, audioDurationSec: 1.0)
+
+        #expect(words.map(\.startSec) == [0.0, 0.8])
+        #expect(words.map(\.endSec) == [0.4, 1.0])
+    }
+
+    @Test("Invalid and non-chronological word timings are discarded")
+    func discardsInvalidAndNonChronologicalTimings() {
+        let tokenTimings = [
+            token("▁valid", start: 0.1, end: 0.3),
+            token("▁invalid", start: .nan, end: 0.4),
+            token("▁later", start: 0.6, end: 0.8),
+            token("▁backwards", start: 0.4, end: 0.5),
+        ]
+
+        let words = makeWordArtifacts(from: tokenTimings, audioDurationSec: 1.0)
+
+        #expect(words.map(\.text) == ["valid", "later"])
+    }
+
     @Test("Empty token timings produce no word artifacts")
     func emptyInputProducesNoWords() {
         #expect(makeWordArtifacts(from: []).isEmpty)

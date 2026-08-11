@@ -40,7 +40,7 @@ Transcript artifact containing:
 
 Transcription currently emits one coarse segment. When `transcribe` or `process` is run with `--word-timestamps`, that segment also contains a `words` array with `text`, `start_sec`, and `end_sec` for each timed word. The field is absent by default.
 
-Word timings are approximate decoder-derived values grouped from FluidAudio token timings. They are not forced-alignment timestamps. If timings are requested but FluidAudio returns no usable token timing data, the artifact contains an empty `words` array and an explanatory note.
+Word timings are approximate decoder-derived values grouped from FluidAudio token timings. They are not forced-alignment timestamps. SentencePiece grouping may produce larger units than orthographic words in languages that do not use spaces consistently. If timings are requested but FluidAudio returns no usable token timing data, the artifact contains an empty `words` array and an explanatory note.
 
 ## `diarization.json`
 

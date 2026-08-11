@@ -1,3 +1,4 @@
+import AVFoundation
 import FluidAudio
 import Foundation
 
@@ -15,24 +16,48 @@ enum TranscriptModelVersion: String, Codable, CaseIterable {
     }
 }
 
-func makeWordArtifacts(from tokenTimings: [TokenTiming]) -> [TranscriptWordArtifact] {
-    buildWordTimings(from: tokenTimings).map { timing in
-        TranscriptWordArtifact(
-            text: timing.word,
-            startSec: timing.startTime,
-            endSec: timing.endTime
-        )
+func makeWordArtifacts(
+    from tokenTimings: [TokenTiming],
+    audioDurationSec: Double? = nil
+) -> [TranscriptWordArtifact] {
+    let durationLimit = audioDurationSec.flatMap { duration in
+        duration.isFinite && duration > 0 ? duration : nil
     }
+    var lastStartSec = -Double.infinity
+    var artifacts: [TranscriptWordArtifact] = []
+
+    for timing in buildWordTimings(from: tokenTimings) {
+        guard timing.startTime.isFinite, timing.endTime.isFinite else {
+            continue
+        }
+        let startSec = min(max(0, timing.startTime), durationLimit ?? .infinity)
+        let endSec = min(max(0, timing.endTime), durationLimit ?? .infinity)
+        guard endSec > startSec, startSec >= lastStartSec else {
+            continue
+        }
+        artifacts.append(
+            TranscriptWordArtifact(
+                text: timing.word,
+                startSec: startSec,
+                endSec: endSec
+            )
+        )
+        lastStartSec = startSec
+    }
+
+    return artifacts
 }
 
 func makeTranscriptArtifact(
     inputURL: URL,
     modelVersion: TranscriptModelVersion,
     result: ASRResult,
+    audioDurationSec: Double? = nil,
     includeWordTimestamps: Bool
 ) -> TranscriptArtifact {
+    let durationSec = audioDurationSec ?? (result.duration > 0 ? result.duration : nil)
     let words = includeWordTimestamps
-        ? makeWordArtifacts(from: result.tokenTimings ?? [])
+        ? makeWordArtifacts(from: result.tokenTimings ?? [], audioDurationSec: durationSec)
         : nil
     var notes = [
         "ASR models are downloaded automatically on first use and cached by FluidAudio.",
@@ -49,7 +74,7 @@ func makeTranscriptArtifact(
         jobID: "",
         input: inputURL.path,
         language: modelVersion == .v2 ? "en" : "auto",
-        durationSec: result.duration,
+        durationSec: durationSec,
         toolVersions: ToolVersions(appVersion: AppConstants.appVersion, fluidAudioVersion: AppConstants.fluidAudioVersion),
         segments: [
             TranscriptSegmentArtifact(
@@ -64,6 +89,18 @@ func makeTranscriptArtifact(
         fullText: result.text,
         notes: notes
     )
+}
+
+func measureAudioDurationSec(at url: URL) -> Double? {
+    guard let audioFile = try? AVAudioFile(forReading: url) else {
+        return nil
+    }
+    let sampleRate = audioFile.fileFormat.sampleRate
+    guard sampleRate > 0 else {
+        return nil
+    }
+    let duration = Double(audioFile.length) / sampleRate
+    return duration.isFinite && duration > 0 ? duration : nil
 }
 
 struct FluidTranscriptionEngine {
@@ -82,6 +119,7 @@ struct FluidTranscriptionEngine {
             inputURL: inputURL,
             modelVersion: modelVersion,
             result: result,
+            audioDurationSec: measureAudioDurationSec(at: inputURL),
             includeWordTimestamps: includeWordTimestamps
         )
     }

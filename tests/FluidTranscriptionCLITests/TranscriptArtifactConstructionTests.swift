@@ -60,6 +60,27 @@ struct TranscriptArtifactConstructionTests {
         #expect(artifact.notes.contains { $0.contains("requested") && $0.contains("unavailable") })
     }
 
+    @Test("Measured audio duration overrides an unusable ASR duration")
+    func measuredAudioDurationOverridesASRDuration() {
+        let result = ASRResult(
+            text: "Hello world",
+            confidence: 0.93,
+            duration: 0,
+            processingTime: 0.1,
+            tokenTimings: nil
+        )
+
+        let artifact = makeTranscriptArtifact(
+            inputURL: URL(fileURLWithPath: "/tmp/example.wav"),
+            modelVersion: .v3,
+            result: result,
+            audioDurationSec: 30,
+            includeWordTimestamps: false
+        )
+
+        #expect(artifact.durationSec == 30)
+    }
+
     @Test("Default construction omits detailed word timings")
     func defaultConstructionOmitsWordTimings() throws {
         let result = ASRResult(

@@ -24,6 +24,17 @@ struct CommandConfigurationTests {
         #expect(timedCommand.transcript.modelVersion == .v2)
     }
 
+    @Test("Diarize rejects the word timestamps option")
+    func diarizeRejectsWordTimestamps() {
+        #expect(throws: (any Error).self) {
+            try DiarizeCommand.parse([
+                "--input", "/tmp/example.wav",
+                "--output", "/tmp/runs",
+                "--word-timestamps",
+            ])
+        }
+    }
+
     @Test("Process word timestamps are opt-in")
     func processWordTimestampsAreOptIn() throws {
         let defaultCommand = try ProcessCommand.parse([

@@ -207,6 +207,7 @@ This project is licensed under Apache License 2.0. See `LICENSE`.
 - Models are not bundled into the repository; FluidAudio downloads required models on first use
 - Transcript segmentation is currently coarse and emitted as a single segment
 - Optional word timings are approximate decoder-derived values rather than forced alignment
+- FluidAudio's SentencePiece grouping may produce larger units than orthographic words in languages that do not use spaces consistently
 - Transcript-to-speaker alignment is not yet implemented beyond separate diarization turn output
 
 ## Documentation Follow-Ups
