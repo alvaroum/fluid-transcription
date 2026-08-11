@@ -61,6 +61,17 @@ enum TranscriptModelArgument: String, ExpressibleByArgument {
     }
 }
 
+struct TranscriptRunOptions: ParsableArguments {
+    @Option(name: .customLong("model-version"), help: "ASR model version to use: v2 for English-only, v3 for multilingual.")
+    var modelVersion: TranscriptModelArgument = .v3
+
+    @Flag(
+        name: .customLong("word-timestamps"),
+        help: "Include approximate word-level start and end times in transcript.json."
+    )
+    var wordTimestamps = false
+}
+
 struct VersionCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "version",
@@ -95,28 +106,39 @@ struct TranscribeCommand: ParsableCommand {
     )
 
     @OptionGroup var common: CommonRunOptions
-    @Option(name: .customLong("model-version"), help: "ASR model version to use: v2 for English-only, v3 for multilingual.")
-    var modelVersion: TranscriptModelArgument = .v3
+    @OptionGroup var transcript: TranscriptRunOptions
 
     mutating func run() throws {
         let input = common.input
         let output = common.output
         let jobID = common.jobID
         let overwrite = common.overwrite
-        let selectedModel = modelVersion.engineValue
+        let selectedModel = transcript.modelVersion.engineValue
+        let includeWordTimestamps = transcript.wordTimestamps
 
         try runBlocking {
             let context = try makeJobContext(inputPath: input, outputPath: output, jobID: jobID, overwrite: overwrite, mode: .transcribe)
             let preparedInput = try InputPreparation.prepareForSynchronousCLI(url: context.inputURL)
             defer { preparedInput.cleanup() }
             let engine = FluidTranscriptionEngine()
-            var events = [EventRecord(timestamp: timestampNow(), event: "job_started", details: ["mode": RunMode.transcribe.rawValue])]
+            var events = [EventRecord(
+                timestamp: timestampNow(),
+                event: "job_started",
+                details: [
+                    "mode": RunMode.transcribe.rawValue,
+                    "word_timestamps": String(includeWordTimestamps),
+                ]
+            )]
             if let strategy = preparedInput.normalizationStrategy {
                 events.append(EventRecord(timestamp: timestampNow(), event: "input_prepared", details: ["strategy": strategy]))
             }
 
             do {
-                var transcript = try await engine.transcribe(inputURL: preparedInput.processingURL, modelVersion: selectedModel)
+                var transcript = try await engine.transcribe(
+                    inputURL: preparedInput.processingURL,
+                    modelVersion: selectedModel,
+                    includeWordTimestamps: includeWordTimestamps
+                )
                 transcript = TranscriptArtifact(
                     schemaVersion: transcript.schemaVersion,
                     jobID: context.jobID,
@@ -212,28 +234,39 @@ struct ProcessCommand: ParsableCommand {
     )
 
     @OptionGroup var common: CommonRunOptions
-    @Option(name: .customLong("model-version"), help: "ASR model version to use: v2 for English-only, v3 for multilingual.")
-    var modelVersion: TranscriptModelArgument = .v3
+    @OptionGroup var transcript: TranscriptRunOptions
 
     mutating func run() throws {
         let input = common.input
         let output = common.output
         let jobID = common.jobID
         let overwrite = common.overwrite
-        let selectedModel = modelVersion.engineValue
+        let selectedModel = transcript.modelVersion.engineValue
+        let includeWordTimestamps = transcript.wordTimestamps
 
         try runBlocking {
             let context = try makeJobContext(inputPath: input, outputPath: output, jobID: jobID, overwrite: overwrite, mode: .process)
             let preparedInput = try InputPreparation.prepareForSynchronousCLI(url: context.inputURL)
             defer { preparedInput.cleanup() }
             let engine = FluidTranscriptionEngine()
-            var events = [EventRecord(timestamp: timestampNow(), event: "job_started", details: ["mode": RunMode.process.rawValue])]
+            var events = [EventRecord(
+                timestamp: timestampNow(),
+                event: "job_started",
+                details: [
+                    "mode": RunMode.process.rawValue,
+                    "word_timestamps": String(includeWordTimestamps),
+                ]
+            )]
             if let strategy = preparedInput.normalizationStrategy {
                 events.append(EventRecord(timestamp: timestampNow(), event: "input_prepared", details: ["strategy": strategy]))
             }
 
             do {
-                var transcript = try await engine.transcribe(inputURL: preparedInput.processingURL, modelVersion: selectedModel)
+                var transcript = try await engine.transcribe(
+                    inputURL: preparedInput.processingURL,
+                    modelVersion: selectedModel,
+                    includeWordTimestamps: includeWordTimestamps
+                )
                 transcript = TranscriptArtifact(
                     schemaVersion: transcript.schemaVersion,
                     jobID: context.jobID,

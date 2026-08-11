@@ -31,6 +31,7 @@ let package = Package(
             name: "FluidTranscriptionCLITests",
             dependencies: [
                 "FluidTranscriptionCLI",
+                .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "FluidAudio", package: "FluidAudio"),
                 .product(name: "Testing", package: "swift-testing"),
             ]
