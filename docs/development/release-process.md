@@ -65,7 +65,7 @@ release/
 - The release workflow updates the tap automatically when the repository secret `HOMEBREW_TAP_TOKEN` is configured with write access to `alvaroum/homebrew-fluid-transcription`.
 - Direct downloads should use the `.pkg` installer; the tarball is primarily for Homebrew and advanced manual installation.
 - Models are not bundled into the release artifact.
-- The current public release line for this repository is `v202604.5`.
+- The current public release line for this repository is `v202608.1`.
 - Update `CHANGELOG.md` before tagging a new release so the repository history ships with the version bump.
 - The release workflow now uses the matching `CHANGELOG.md` section as the GitHub release body when it exists.
 - If a matching changelog section is missing, the workflow falls back to generating release notes from commit subjects since the previous tag.

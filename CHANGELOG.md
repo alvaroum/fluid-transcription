@@ -4,7 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## v202608.1 - 2026-08-11
+
 - Added opt-in word-level timestamps for the `transcribe` and `process` commands through `--word-timestamps`.
+- Added measured audio duration and timing sanitization so enabled word timings remain finite, chronological, and within the audio bounds.
 - Updated FluidAudio from `0.14.5` to `0.15.5` and swift-argument-parser from `1.7.1` to `1.8.2`.
 - Added automated GitHub release notes generation from `CHANGELOG.md`, with a commit-history fallback in the release workflow.
 

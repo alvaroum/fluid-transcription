@@ -43,7 +43,7 @@ Examples below are intentionally shortened and sanitized.
   "language": "auto",
   "duration_sec": 321.4,
   "tool_versions": {
-    "appVersion": "202604.5",
+    "appVersion": "202608.1",
     "fluidAudioVersion": "0.15.5"
   },
   "segments": [
@@ -96,7 +96,7 @@ These values are approximate decoder-derived timings. If timing was requested bu
   "input": "/path/to/meeting.m4a",
   "duration_sec": 321.4,
   "tool_versions": {
-    "appVersion": "202604.5",
+    "appVersion": "202608.1",
     "fluidAudioVersion": "0.15.5"
   },
   "speakers": [
@@ -128,7 +128,7 @@ These values are approximate decoder-derived timings. If timing was requested bu
   "job_id": "meeting-a1b2c3d4e5f6",
   "input": "/path/to/meeting.m4a",
   "tool_versions": {
-    "appVersion": "202604.5",
+    "appVersion": "202608.1",
     "fluidAudioVersion": "0.15.5"
   },
   "summary": {
