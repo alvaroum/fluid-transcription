@@ -25,35 +25,64 @@ func makeWordArtifacts(from tokenTimings: [TokenTiming]) -> [TranscriptWordArtif
     }
 }
 
+func makeTranscriptArtifact(
+    inputURL: URL,
+    modelVersion: TranscriptModelVersion,
+    result: ASRResult,
+    includeWordTimestamps: Bool
+) -> TranscriptArtifact {
+    let words = includeWordTimestamps
+        ? makeWordArtifacts(from: result.tokenTimings ?? [])
+        : nil
+    var notes = [
+        "ASR models are downloaded automatically on first use and cached by FluidAudio.",
+        "The transcript currently contains one coarse segment."
+    ]
+    if let words, !words.isEmpty {
+        notes.append("Word timestamps are approximate decoder-derived timings aggregated from FluidAudio token timings.")
+    } else if includeWordTimestamps {
+        notes.append("Word timestamps were requested but unavailable because FluidAudio returned no usable token timings.")
+    }
+
+    return TranscriptArtifact(
+        schemaVersion: AppConstants.schemaVersion,
+        jobID: "",
+        input: inputURL.path,
+        language: modelVersion == .v2 ? "en" : "auto",
+        durationSec: result.duration,
+        toolVersions: ToolVersions(appVersion: AppConstants.appVersion, fluidAudioVersion: AppConstants.fluidAudioVersion),
+        segments: [
+            TranscriptSegmentArtifact(
+                segmentID: "seg-0001",
+                startSec: words?.first?.startSec,
+                endSec: words?.last?.endSec,
+                text: result.text,
+                confidence: Double(result.confidence),
+                words: words
+            )
+        ],
+        fullText: result.text,
+        notes: notes
+    )
+}
+
 struct FluidTranscriptionEngine {
-    func transcribe(inputURL: URL, modelVersion: TranscriptModelVersion) async throws -> TranscriptArtifact {
+    func transcribe(
+        inputURL: URL,
+        modelVersion: TranscriptModelVersion,
+        includeWordTimestamps: Bool = false
+    ) async throws -> TranscriptArtifact {
         let models = try await AsrModels.downloadAndLoad(version: modelVersion.fluidAudioValue)
         let manager = AsrManager()
         try await manager.loadModels(models)
         var decoderState = TdtDecoderState.make(decoderLayers: await manager.decoderLayerCount)
         let result = try await manager.transcribe(inputURL, decoderState: &decoderState)
 
-        return TranscriptArtifact(
-            schemaVersion: AppConstants.schemaVersion,
-            jobID: "",
-            input: inputURL.path,
-            language: modelVersion == .v2 ? "en" : "auto",
-            durationSec: nil,
-            toolVersions: ToolVersions(appVersion: AppConstants.appVersion, fluidAudioVersion: AppConstants.fluidAudioVersion),
-            segments: [
-                TranscriptSegmentArtifact(
-                    segmentID: "seg-0001",
-                    startSec: nil,
-                    endSec: nil,
-                    text: result.text,
-                    confidence: Double(result.confidence)
-                )
-            ],
-            fullText: result.text,
-            notes: [
-                "ASR models are downloaded automatically on first use and cached by FluidAudio.",
-                "Initial Swift CLI integration emits a single transcript segment until richer ASR timing extraction is added."
-            ]
+        return makeTranscriptArtifact(
+            inputURL: inputURL,
+            modelVersion: modelVersion,
+            result: result,
+            includeWordTimestamps: includeWordTimestamps
         )
     }
 
